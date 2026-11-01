@@ -4,20 +4,88 @@
 <style>
 :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;color:#e9edf8;background:#090f1c}*{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer}a{color:#9ebdff}.shell{display:grid;grid-template-columns:245px minmax(0,1fr);min-height:100vh}.sidebar{padding:30px 20px;background:#0d1525;border-right:1px solid #273249}.brand{font-weight:800;font-size:19px;letter-spacing:-.5px}.brand span{color:#7ea6ff}.muted{color:#94a1ba}.small{font-size:12px}.nav{margin-top:38px;display:grid;gap:10px}.nav div{padding:12px;border-radius:10px;color:#9baac3}.nav .active{background:#1b2a48;color:#fff}.sidefoot{margin-top:45px;font-size:12px;line-height:1.7;color:#a0abc0}.main{padding:34px;max-width:1440px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;gap:18px;align-items:center}.eyebrow{color:#8daeff;font-weight:700;letter-spacing:2px;font-size:11px}h1{margin:7px 0;font-size:31px;letter-spacing:-1px}h2{font-size:16px;margin:0 0 18px}.pill{display:inline-block;background:#173529;color:#9ce6b8;padding:9px 12px;border-radius:30px;font-size:12px}.notice{margin:23px 0;background:#18233b;border:1px solid #31456d;padding:13px 17px;border-radius:12px;color:#c4d2ee;font-size:13px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.panel{background:#121c2e;border:1px solid #283750;border-radius:16px;padding:21px}.stat{font-size:30px;font-weight:800;margin:12px 0 5px}.content{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.85fr);gap:16px;margin-top:17px}.chat{min-height:430px;display:flex;flex-direction:column}.messages{flex:1;display:flex;flex-direction:column;gap:12px;max-height:360px;overflow:auto;margin-bottom:18px}.bubble{background:#21314d;border-radius:12px;padding:12px 14px;line-height:1.6;font-size:14px;max-width:92%;white-space:pre-wrap}.bubble.user{align-self:flex-end;background:#3159a0}.composer{display:flex;gap:9px}.composer input{flex:1;min-width:0;border:1px solid #3a4b68;background:#0b1425;color:#fff;padding:13px;border-radius:10px}.primary{background:#7da5ff;color:#081329;border:0;padding:12px 17px;border-radius:10px;font-weight:800}.quick{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 15px}.quick button{border:1px solid #3a4b68;background:#1a2941;color:#d6e3fc;padding:8px 10px;border-radius:9px;font-size:12px}.trace{display:grid;gap:10px}.trace-item{border-left:2px solid #6c9dff;padding:7px 0 7px 12px;background:#15233a;font-size:12px}.trace-item strong{display:block;margin-bottom:4px}.row{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #2a3650;font-size:13px}.row:last-child{border:0}.tag{color:#8eb3ff}.foot{font-size:12px;color:#8797b3;margin-top:22px}@media(max-width:850px){.shell{grid-template-columns:1fr}.sidebar{padding:18px}.nav,.sidefoot{display:none}.main{padding:20px}.content{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.top{align-items:start}h1{font-size:25px}}
 </style></head><body><div class="shell"><aside class="sidebar"><div class="brand">◈ BOBAL<span> / OPS</span></div><p class="muted small">AI Banking Operations Console</p><div class="nav"><div class="active">▦ &nbsp; Overview</div><div>◇ &nbsp; Agent workspace</div><div>≡ &nbsp; Audit trail</div><div>◎ &nbsp; Case management</div></div><div class="sidefoot">DEMO ENVIRONMENT<br>Synthetic records only<br>No real banking connections</div></aside>
-<main class="main"><header class="top"><div><div class="eyebrow">OPERATIONS INTELLIGENCE</div><h1>Banking Operations Agent</h1><div class="muted">Investigate transactions and coordinate support workflows.</div></div><span class="pill">● Demo online</span></header>
-<div class="notice"><strong>Simulation mode:</strong> This UI currently uses deterministic, local mock tools. It does not call a live LLM, AWS Bedrock, MCP server or banking API.</div>
-<section class="stats"><div class="panel"><div class="muted small">SYNTHETIC ACCOUNTS</div><div class="stat">3</div><div class="muted small">Available for investigation</div></div><div class="panel"><div class="muted small">SAMPLE TRANSACTIONS</div><div class="stat">5</div><div class="muted small">Searchable demo records</div></div><div class="panel"><div class="muted small">SUPPORT CASES</div><div class="stat" id="caseCount">1</div><div class="muted small">Local session only</div></div></section>
-<div class="content"><section class="panel chat"><h2>Agent workspace <span class="muted small">/ mock tool runner</span></h2><div class="quick"><button data-q="Show account ACC-1001">Account lookup</button><button data-q="Find transaction TX-2002">Transaction lookup</button><button data-q="Create a support case for TX-2002">Create support case</button></div><div class="messages" id="messages" aria-live="polite"><div class="bubble">Welcome. I can demonstrate account lookup, transaction investigation, and case creation using synthetic banking records. Choose a shortcut or enter an account / transaction ID.</div></div><form class="composer" id="form"><input id="prompt" aria-label="Ask the operations agent" placeholder="Ask about ACC-1001 or TX-2002..." autocomplete="off"><button class="primary" type="submit">Run ↗</button></form></section>
-<section><div class="panel"><h2>Tool execution timeline</h2><div id="trace" class="trace"><div class="muted small">No tools invoked yet. Run an investigation to see an auditable sequence.</div></div></div><div class="panel" style="margin-top:16px"><h2>Sample records</h2><div class="row"><span>ACC-1001</span><span class="tag">Everyday Chequing</span></div><div class="row"><span>ACC-1002</span><span class="tag">Savings</span></div><div class="row"><span>ACC-1003</span><span class="tag">Business Operating</span></div><div class="row"><span>TX-2002</span><span class="tag">Review required</span></div></div></section></div><div class="foot">Built as an educational engineering portfolio demo. All identities, balances, transactions and cases are fabricated.</div></main></div>
+<main class="main"><header class="top"><div><div class="eyebrow">OPERATIONS INTELLIGENCE</div><h1>Banking Operations Agent</h1><div class="muted">Investigate transactions and coordinate support workflows.</div></div><span class="pill">● Checking backend…</span></header>
+<div class="notice"><strong id="mode-title">Connecting to Java backend…</strong> <span id="mode-detail">Read-only structured tool calls over fabricated data. No LLM or bank connection.</span></div>
+<section class="stats"><div class="panel"><div class="muted small">SYNTHETIC ACCOUNTS</div><div class="stat">3</div><div class="muted small">Available for investigation</div></div><div class="panel"><div class="muted small">SAMPLE TRANSACTIONS</div><div class="stat">5</div><div class="muted small">Searchable demo records</div></div><div class="panel"><div class="muted small">SUPPORT CASES</div><div class="stat" id="caseCount">1</div><div class="muted small">Read-only synthetic cases</div></div></section>
+<div class="content"><section class="panel chat"><h2>Agent workspace <span class="muted small">/ read-only structured tools</span></h2><div class="quick"><button data-q="Investigate TX-2002">Investigate flagged transaction</button><button data-q="Show transactions for ACC-1001">Account activity</button><button data-q="List support cases">List support cases</button></div><div class="messages" id="messages" aria-live="polite"><div class="bubble">Welcome. Investigate TX-2002, show activity for ACC-1001 or list support cases. Every response includes a backend tool trace. Write actions are denied.</div></div><form class="composer" id="form"><input id="prompt" aria-label="Ask the operations agent" placeholder="Ask about ACC-1001 or TX-2002..." autocomplete="off"><button class="primary" type="submit">Run ↗</button></form></section>
+<section><div class="panel"><h2>Tool execution timeline</h2><div id="trace" class="trace"><div class="muted small">No tools invoked yet. Run an investigation to inspect the backend trace.</div></div></div><div class="panel" style="margin-top:16px"><h2>Sample records</h2><div class="row"><span>ACC-1001</span><span class="tag">Everyday Chequing</span></div><div class="row"><span>ACC-1002</span><span class="tag">Savings</span></div><div class="row"><span>ACC-1003</span><span class="tag">Business Operating</span></div><div class="row"><span>TX-2002</span><span class="tag">Review required</span></div></div></section></div><div class="foot">Read-only engineering demo using fabricated records. Deterministic structured tools, not a generative AI model. No actual banking systems.</div></main></div>
 <script>
-const accounts={'ACC-1001':{type:'Everyday Chequing',balance:4820.50,currency:'CAD'},'ACC-1002':{type:'High Interest Savings',balance:12840.75,currency:'CAD'},'ACC-1003':{type:'Business Operating',balance:38750.00,currency:'CAD'}};
-const transactions={'TX-2001':{account:'ACC-1001',amount:-48.25,merchant:'Transit Pass',status:'Settled'},'TX-2002':{account:'ACC-1001',amount:-1250,merchant:'Online Transfer',status:'Review required'},'TX-2003':{account:'ACC-1002',amount:250,merchant:'Interest Credit',status:'Settled'},'TX-2004':{account:'ACC-1003',amount:-380,merchant:'Office Supplies',status:'Settled'},'TX-2005':{account:'ACC-1003',amount:1920,merchant:'Invoice Payment',status:'Pending'}};
-let cases=[{id:'CASE-001',transaction:'TX-2002'}];const $=id=>document.getElementById(id);
-function bubble(message,role='agent'){const el=document.createElement('div');el.className='bubble '+role;el.textContent=message;$('messages').append(el);$('messages').scrollTop=$('messages').scrollHeight}
-function tool(name,detail){const t=$('trace');if(t.querySelector('.muted'))t.textContent='';const el=document.createElement('div');el.className='trace-item';const strong=document.createElement('strong');strong.textContent=name;const info=document.createElement('span');info.textContent=detail;el.append(strong,info);t.prepend(el)}
-function run(query){bubble(query,'user');const q=query.toUpperCase();const account=q.match(/ACC-\d{4}/)?.[0];const tx=q.match(/TX-\d{4}/)?.[0];const wantsCase=/CASE|ESCALAT|TICKET/.test(q);if(wantsCase){if(!tx||!transactions[tx]){bubble('To create a case, specify a valid synthetic transaction ID, such as TX-2002.');return}const existing=cases.find(c=>c.transaction===tx);if(existing){tool('case.lookup',existing.id);bubble('A support case already exists for '+tx+': '+existing.id+'. No duplicate case was created.');return}const id='CASE-'+String(cases.length+1).padStart(3,'0');cases.push({id,transaction:tx});$('caseCount').textContent=cases.length;tool('case.create',id+' · '+tx);bubble('Created synthetic support case '+id+' for '+tx+'. This case is stored in the current browser session only.');return}
-if(tx){tool('transaction.lookup',tx);const t=transactions[tx];if(!t){bubble('No synthetic transaction found for '+tx+'.');return}bubble(tx+' · '+t.status+'\nAccount: '+t.account+'\nMerchant: '+t.merchant+'\nAmount: '+t.amount.toLocaleString('en-CA',{style:'currency',currency:'CAD'})+'\n\nThis is demo data; review status is not a real fraud assessment.');return}
-if(account){tool('account.lookup',account);const a=accounts[account];bubble(a?account+' · '+a.type+'\nAvailable sample balance: '+a.balance.toLocaleString('en-CA',{style:'currency',currency:a.currency}):'No synthetic account found for '+account+'.');return}
-bubble('Try “Show account ACC-1001”, “Find transaction TX-2002”, or “Create a support case for TX-2002”. This mock agent supports those three workflows only.')}
-$('form').addEventListener('submit',e=>{e.preventDefault();const v=$('prompt').value.trim();if(v){run(v);$('prompt').value=''}});document.querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>run(b.dataset.q)));
+
+const $=id=>document.getElementById(id);
+const badge=document.querySelector('.pill');
+const form=$('form');
+const prompt=$('prompt');
+let online=false;
+function bubble(message,role='agent'){
+  const el=document.createElement('div');
+  el.className='bubble '+role;
+  el.textContent=message;
+  $('messages').append(el);
+  $('messages').scrollTop=$('messages').scrollHeight;
+}
+function tool(item,requestId){
+  const t=$('trace');
+  if(t.querySelector('.muted'))t.textContent='';
+  const el=document.createElement('div');
+  el.className='trace-item';
+  const strong=document.createElement('strong');
+  strong.textContent=item.tool+' · '+item.outcome;
+  const info=document.createElement('span');
+  info.textContent=item.input+' | '+item.permission+' | request '+requestId.slice(0,8);
+  el.append(strong,info);
+  t.prepend(el);
+}
+async function checkBackend(){
+  try{
+    const r=await fetch('/api/health',{cache:'no-store'});
+    if(!r.ok)throw new Error('Health check failed');
+    const health=await r.json();
+    if(health.mode!=='synthetic-demo')throw new Error('Unexpected backend');
+    online=true;
+    badge.textContent='● Java backend connected';
+    $('mode-title').textContent='Read-only backend connected.';
+    $('mode-detail').textContent='Java 21, Spring Boot and allowlisted structured tools. Synthetic data only. No LLM or bank access.';
+  }catch(e){
+    online=false;
+    badge.textContent='● Backend offline';
+    $('mode-title').textContent='Backend unavailable.';
+    $('mode-detail').textContent='This static page cannot run investigations. Start Spring Boot locally or connect a backend deployment. No simulated answers are shown.';
+  }
+}
+async function run(query){
+  bubble(query,'user');
+  if(!online){
+    bubble('Backend unavailable. No tools were executed. Run the Java application or visit its deployed backend when available.');
+    return;
+  }
+  prompt.disabled=true;
+  form.querySelector('button').disabled=true;
+  try{
+    const r=await fetch('/api/agent/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:query})
+    });
+    if(!r.ok)throw new Error(r.status===429?'Rate limit reached. Try again next minute.':'Request failed (HTTP '+r.status+').');
+    const result=await r.json();
+    bubble(result.answer);
+    result.trace.forEach(item=>tool(item,result.requestId));
+    if(result.trace.length===0)bubble('No tools called. Read-only policy or unsupported request.');
+  }catch(e){
+    bubble('Could not complete the request: '+e.message);
+  }finally{
+    prompt.disabled=false;
+    form.querySelector('button').disabled=false;
+    prompt.focus();
+  }
+}
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  const v=prompt.value.trim();
+  if(v){run(v);prompt.value='';}
+});
+document.querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>run(b.dataset.q)));
+prompt.maxLength=240;
+checkBackend();
+
 </script></body></html>
