@@ -14,3 +14,18 @@ jobs:
           cache: maven
       - name: Run unit and integration tests
         run: mvn -B clean verify
+      - name: Smoke test running HTTP service
+        run: |
+          java -jar target/banking-operations-agent-0.1.0.jar > /tmp/agent.log 2>&1 &
+          PID=$!
+          trap 'kill $PID || true' EXIT
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8080/api/health > /tmp/health.json; then break; fi
+            sleep 2
+          done
+          python3 -c 'import json; assert json.load(open("/tmp/health.json"))["status"] == "UP"'
+          curl -fsS http://localhost:8080/ | grep -q 'Banking Operations Agent'
+          curl -fsS http://localhost:8080/api/agent/chat \
+            -H 'Content-Type: application/json' \
+            -d '{"message":"Investigate TX-2002"}' > /tmp/investigation.json
+          python3 -c 'import json; d=json.load(open("/tmp/investigation.json")); assert [x["tool"] for x in d["trace"]] == ["transaction.lookup", "account.lookup", "case.by_transaction"]; assert d["syntheticData"]'
