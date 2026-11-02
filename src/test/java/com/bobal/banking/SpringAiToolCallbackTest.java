@@ -3,7 +3,7 @@ package com.bobal.banking;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.ToolCallbacks;
+import org.springframework.ai.support.ToolCallbacks;
 import static org.assertj.core.api.Assertions.*;
 
 class SpringAiToolCallbackTest {
