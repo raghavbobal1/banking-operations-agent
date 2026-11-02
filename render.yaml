@@ -1,3 +1,5 @@
+# Create this as a Blueprint in Render so the secret is entered privately
+# in the Render dashboard, never committed to source control.
 services:
   - type: web
     name: banking-operations-agent
@@ -6,3 +8,12 @@ services:
     dockerfilePath: ./Dockerfile
     healthCheckPath: /api/health
     autoDeployTrigger: commit
+    envVars:
+      - key: AI_ENABLED
+        value: "true"
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: JAVA_TOOL_OPTIONS
+        value: "-XX:MaxRAMPercentage=65.0 -XX:ActiveProcessorCount=2"

@@ -7,7 +7,7 @@ A Java 21 / Spring Boot prototype that investigates **fictional banking records*
 - **AI mode**: Spring AI sends the user's question to an actual configured OpenAI chat model. The model selects from seven `@Tool` read-only banking operations. The server executes them, returns their results to the model and records every tool call.
 - **Offline mode**: Without an AI provider, a separate deterministic intent router answers a small collection of preset banking questions. This is **not an LLM or AI reasoning**. The UI shows the current mode.
 
-AI mode is **off by default** so a public static preview cannot run unrestricted paid model calls. It is not deployed or verified live merely because the code exists.
+AI mode is **off by default locally**. The Render Blueprint enables it only with a private API key. A public static preview cannot run unrestricted paid model calls. A working deployment is not verified merely because the code exists.
 
 ## Run and test
 
@@ -29,6 +29,26 @@ mvn spring-boot:run
 ```
 
 The application refuses to start in AI mode if the key is absent. `AI_ENABLED=false` keeps the local deterministic demo available without a key. OpenAI API access may incur charges; the ChatGPT subscription does not include API usage.
+
+## Deploy a real AI demo on Render
+
+The repository includes a [Render Blueprint](render.yaml) configured for the Java Docker backend with `AI_ENABLED=true`. It prompts for the private `OPENAI_API_KEY` during **initial Blueprint creation**. Do not paste that key into GitHub, ChatGPT, the browser UI or a public issue.
+
+1. Create an OpenAI API key at [OpenAI API keys](https://platform.openai.com/api-keys). Configure a small usage budget at the OpenAI platform and make sure the project has API billing access. A ChatGPT subscription does not supply API credit.
+2. In [Render](https://dashboard.render.com/), choose **New > Blueprint** and connect `raghavbobal1/banking-operations-agent` on GitHub. Select its `render.yaml` file.
+3. When Render prompts for `OPENAI_API_KEY`, enter the key privately in Render. Keep `AI_ENABLED=true`. If the Blueprint already exists, set missing secrets manually in your service's **Environment** settings and redeploy.
+4. Deploy, then check `https://YOUR-SERVICE.onrender.com/api/agent/status`. It must return `"aiEnabled": true` and `"mode": "spring-ai-tool-calling"`. If it reports offline mode, this is not a live AI demo.
+5. Run the real HTTP verification from this repo, using your actual Render service URL:
+
+```bash
+python3 scripts/verify_demo.py https://YOUR-SERVICE.onrender.com --mode ai
+```
+
+That verification calls the live model once, checks the server executed a real read-only transaction tool and confirms that a transfer request is denied without executing tools. A successful `/api/health` alone does **not** prove AI is working.
+
+**Cost and safety:** This is a synthetic demo, not a bank service. The process-local quota is 6 model requests per minute and 100 per day, not a durable spending limit. Set a separate provider-side budget and monitor charges. On Render's Free plan the service may sleep and cold-start. Use a paid instance only if you decide the cost is justified. The Blueprint does not include any secret values.
+
+**Deployment status:** There is no confirmed public AI URL in this repository. Keep portfolio demo links unpublished until the hosted AI verification succeeds.
 
 ## Try these questions
 

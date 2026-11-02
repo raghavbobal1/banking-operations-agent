@@ -29,3 +29,4 @@ jobs:
             -H 'Content-Type: application/json' \
             -d '{"message":"Investigate TX-2002"}' > /tmp/investigation.json
           python3 -c 'import json; d=json.load(open("/tmp/investigation.json")); assert [x["tool"] for x in d["trace"]] == ["transaction.lookup", "account.lookup", "case.by_transaction"]; assert d["syntheticData"]'
+          python3 scripts/verify_demo.py http://localhost:8080 --mode offline
