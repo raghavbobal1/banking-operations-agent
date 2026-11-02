@@ -1,64 +1,60 @@
 # Banking Operations Agent
 
-A read-only banking investigation console built with Java 21 and Spring Boot. The backend executes deterministic structured tool calls against fabricated records. It is not a generative AI agent and it does not connect to any bank, AWS Bedrock or MCP server.
+A Java 21 / Spring Boot prototype that investigates **fictional banking records**. This project builds on the tool-calling concept from a short Spring AI tutorial and applies it to a more realistic read-only banking workflow.
 
-## Working features
+## Two explicit modes
 
-- Investigate `TX-2002` with transaction, account and case lookup in one request.
-- Show transactions for `ACC-1001` using two chained read-only tools.
-- List cases or inspect an account, transaction or case by ID.
-- Inspect a request ID, permission and outcome for every executed tool.
-- Reject write requests, unknown identifiers and oversized input.
-- Per-IP in-memory chat limit of 40 requests per minute.
-- Responsive browser console served by Spring Boot.
+- **AI mode**: Spring AI sends the user's question to an actual configured OpenAI chat model. The model selects from seven `@Tool` read-only banking operations. The server executes them, returns their results to the model and records every tool call.
+- **Offline mode**: Without an AI provider, a separate deterministic intent router answers a small collection of preset banking questions. This is **not an LLM or AI reasoning**. The UI shows the current mode.
 
-All names, balances and transactions are synthetic. The agent does not make a real fraud determination.
+AI mode is **off by default** so a public static preview cannot run unrestricted paid model calls. It is not deployed or verified live merely because the code exists.
 
-## Run locally
+## Run and test
 
-Requires JDK 21 and Maven 3.9+.
+Requires Java 21 and Maven 3.9+.
 
 ```bash
 mvn -B clean verify
 mvn spring-boot:run
+# open http://localhost:8080
 ```
 
-Open `http://localhost:8080`. The UI checks `/api/health` and refuses to fabricate answers if the backend is unavailable.
+Enable actual model-driven tool calling with a separately provisioned API key. Do not commit keys to Git.
 
 ```bash
-curl -s http://localhost:8080/api/agent/chat \
-  -H 'Content-Type: application/json' \
-  -d '{"message":"Investigate TX-2002"}'
+export OPENAI_API_KEY="your-private-api-key"
+export OPENAI_MODEL="gpt-4o-mini"
+export AI_ENABLED=true
+mvn spring-boot:run
 ```
 
-The JSON response includes `mode: deterministic-structured-tools`, a request ID and an ordered trace.
+The application refuses to start in AI mode if the key is absent. `AI_ENABLED=false` keeps the local deterministic demo available without a key. OpenAI API access may incur charges; the ChatGPT subscription does not include API usage.
 
-## API and permissions
+## Try these questions
 
-| Route | Method | Description |
-| --- | --- | --- |
-| `/api/health` | GET | Synthetic demo health |
-| `/api/agent/tools` | GET | Read-only tool registry |
-| `/api/agent/chat` | POST | Validated question and tool execution |
-| `/api/accounts` | GET | Synthetic accounts |
-| `/api/transactions` | GET | Synthetic transactions |
-| `/api/cases` | GET | Synthetic support cases |
+- Investigate TX-2002 and show its related account and case
+- What transactions belong to ACC-1001?
+- Why is TX-2002 marked for review?
+- Is there evidence that TX-2002 was fraudulent?
+- List all support cases
+- Transfer $500 from ACC-1001 (blocked, no tools executed)
 
-The agent uses only `read:accounts`, `read:transactions` and `read:cases`. There is no case creation, transfer or update endpoint. The question limit is 240 characters. The in-memory rate limit is for a demo, not a production security control.
+Use `GET /api/agent/status` to confirm whether the **actual running backend** is in `spring-ai-tool-calling` or `deterministic-structured-tools` mode. `POST /api/agent/chat` returns an answer, explicit mode and ordered tool trace.
 
-## Architecture and deployment
+## Safeguards and limitations
 
-See [architecture.md](architecture.md) for the Mermaid diagram, boundaries and sample trace. GitHub Actions runs `mvn -B clean verify` on Java 21. `Dockerfile` packages a Java 21 runtime and `render.yaml` defines a Render Docker web service with `/api/health` checks.
+Only seven lookup/list tools are exposed. All sample accounts, transactions and cases are fabricated. There is no write endpoint and no real bank integration. The server validates tool IDs, rejects write-like user requests before the model call and caps tool executions at 8 per request. There is a per-IP 40-request/minute in-memory API limit and an additional process-wide AI quota of 6/minute and 100/day. Responses do not include the API key or provider error details. These are lightweight demo controls, not production security measures or per-account authorization.
 
-A Render account connection and successful public HTTP check are required before calling the backend demo live. The root `index.html` is a static preview. It clearly reports the backend as offline when viewed without Spring Boot.
+The model can still make mistakes or respond without calling a tool. Source record IDs and tool traces are the evidence of what was actually retrieved, not proof of a correct fraud determination. The AI mode currently uses stateless single-turn chat, not persistent memory. The fallback route does not call an LLM.
 
-## Example questions
+## API and architecture
 
-- Investigate TX-2002
-- Show transactions for ACC-1001
-- Show account ACC-1002
-- List support cases
-- Show case CASE-001
-- Transfer money from ACC-1001 (denied)
+- `GET /api/health`: application health
+- `GET /api/agent/status`: explicit AI vs offline mode
+- `GET /api/agent/tools`: read-only tool catalog
+- `POST /api/agent/chat`: investigation or denial
+- `GET /api/accounts`, `/api/transactions`, `/api/cases`: fictional data
 
-No real bank data, credentials or paid LLM calls are used.
+See [architecture.md](architecture.md). GitHub Actions runs Maven verification and HTTP smoke tests without using a paid model key. Real provider integration must be separately smoke-tested with `AI_ENABLED=true` and a private API key. `render.yaml` is deployment configuration, **not proof of a deployed service**.
+
+No actual bank systems, credentials, customer data, AWS Bedrock or MCP server are used. Spring AI's native tool calling is the AI integration in this iteration.

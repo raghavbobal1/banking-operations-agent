@@ -8,7 +8,7 @@ RUN mvn -B -DskipTests package
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 RUN useradd -r -u 10001 appuser
-COPY --from=build /app/target/banking-operations-agent-0.1.0.jar /app/app.jar
+COPY --from=build /app/target/banking-operations-agent-0.2.0.jar /app/app.jar
 USER appuser
 ENV PORT=8080
 EXPOSE 8080

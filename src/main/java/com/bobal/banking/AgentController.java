@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import org.springframework.beans.factory.ObjectProvider;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -33,6 +34,7 @@ public class AgentController {
     private static final List<String> PERMISSIONS =
         List.of("read:accounts", "read:transactions", "read:cases");
     private final OperationsController data;
+    private final ObjectProvider<AiAgentService> aiService;
     private final Map<String, Window> limits = new ConcurrentHashMap<>();
     private record Window(long minute, int count) {}
     public record ChatRequest(@NotBlank @Size(max = 240) String message) {}
@@ -41,7 +43,18 @@ public class AgentController {
                                List<Trace> trace, List<String> permissions, boolean syntheticData) {}
     public record Tool(String name, String permission, String description) {}
 
-    public AgentController(OperationsController data) { this.data = data; }
+    public AgentController(OperationsController data, ObjectProvider<AiAgentService> aiService) {
+        this.data = data;
+        this.aiService = aiService;
+    }
+
+    @GetMapping("/status")
+    public Map<String, Object> status() {
+        boolean active = aiService.getIfAvailable() != null;
+        return Map.of("mode", active ? "spring-ai-tool-calling" : "deterministic-structured-tools",
+            "aiEnabled", active, "syntheticData", true,
+            "model", active ? System.getenv().getOrDefault("OPENAI_MODEL", "gpt-4o-mini") : "none");
+    }
 
     @GetMapping("/tools")
     public List<Tool> tools() {
@@ -59,6 +72,13 @@ public class AgentController {
     public ChatResponse chat(@Valid @RequestBody ChatRequest request, HttpServletRequest http) {
         rateLimit(http.getRemoteAddr());
         String input = request.message().trim().toUpperCase(Locale.ROOT);
+        if (WRITE.matcher(input).find()) {
+            return new ChatResponse(UUID.randomUUID().toString(), "policy-denied",
+                "Denied. This agent has read-only permissions. It cannot create cases, move money or change records.",
+                List.of(), PERMISSIONS, true);
+        }
+        AiAgentService ai = aiService.getIfAvailable();
+        if (ai != null) return ai.investigate(request.message());
         List<Trace> trace = new ArrayList<>();
         String answer;
         if (WRITE.matcher(input).find()) {
