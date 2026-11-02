@@ -2,37 +2,39 @@
 
 ```mermaid
 flowchart LR
-  B[Browser console] -->|POST /api/agent/chat| V[Input validation and rate limit]
-  V --> R[Deterministic intent router]
-  R --> P{Read-only permission allowlist}
-  P --> A[account lookup and list]
-  P --> T[transaction lookup and activity]
-  P --> C[case lookup and list]
-  A --> D[(Fabricated in-memory records)]
-  T --> D
-  C --> D
-  R --> X[Answer with request ID and ordered tool trace]
-  X --> B
+    UI[Browser chat] --> API[Spring Boot validation and rate limits]
+    API --> G{AI_ENABLED + server key?}
+    G -->|No| D[Deterministic demo router]
+    G -->|Yes| L[Spring AI ChatClient]
+    L <--> M[OpenAI chat model]
+    L --> T[Seven @Tool read-only operations]
+    T --> V[ID validation and 8-call budget]
+    V --> F[(Fabricated accounts, transactions and cases)]
+    T --> A[Per-request ordered tool trace]
+    D --> API
+    A --> API
+    L --> API
+    API --> UI
 ```
 
-## Trust boundaries
+## Security boundaries
 
-- The browser is untrusted. Inputs are validated by the Java backend.
-- Tool names and permissions are chosen server-side from a fixed read-only allowlist.
-- Every tool call emits a trace entry with the input, outcome and permission.
-- No tool writes data. There is no transfer or case creation endpoint.
-- There is no LLM, Spring AI or MCP integration yet. The router is deterministic.
-- Requests are limited to 40 per remote IP per minute in memory. This is not a production distributed quota.
-- All data is fabricated and is never persisted.
+1. Backend blocks write requests before reaching the model. Only read tool methods are registered. There are no state-changing backend routes.
+2. Model input is untrusted. Tool arguments are strictly validated server-side as synthetic IDs. Tool responses contain fabricated records and must not be treated as instructions.
+3. Each HTTP call creates a new `BankingReadTools` instance. Its ordered trace and 8-call ceiling cannot leak into another request.
+4. Model access is disabled unless `AI_ENABLED=true` and `OPENAI_API_KEY` is configured on the server. Requests are subject to both IP rate limiting and a global daily/minute quota.
+5. Provider errors return a sanitized 502 response. They are **not** silently replaced by fake AI answers.
+6. Only a deliberately configured hosted model call can incur API costs. Local fallback tests use no provider key.
 
-## Investigation example
+## Example AI investigation
 
 ```text
-Investigate TX-2002
-  transaction.lookup(TX-2002) [read:transactions]
-  account.lookup(ACC-1001) [read:accounts]
-  case.by_transaction(TX-2002) [read:cases]
-  -> transaction summary, linked account, case and evidence limitations
+Question: Investigate TX-2002 and its linked case
+  model selects lookupTransaction("TX-2002")
+  model may select lookupAccount("ACC-1001")
+  model may select casesForTransaction("TX-2002")
+  model explains returned evidence, with IDs
+Response: mode=spring-ai-tool-calling, answer, ordered tool trace
 ```
 
-A review status in the synthetic record is not evidence of fraud. The agent explains when it cannot determine a cause.
+Actual tool selection varies by model and prompt, unlike the fixed deterministic fallback. A transaction status of "Review required" does not establish a fraud cause.
