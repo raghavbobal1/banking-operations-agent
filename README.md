@@ -63,7 +63,7 @@ Use `GET /api/agent/status` to confirm whether the **actual running backend** is
 
 ## Safeguards and limitations
 
-Only seven lookup/list tools are exposed. All sample accounts, transactions and cases are fabricated. There is no write endpoint and no real bank integration. The server validates tool IDs, rejects write-like user requests before the model call and caps tool executions at 8 per request. There is a per-IP 40-request/minute in-memory API limit and an additional process-wide AI quota of 6/minute and 100/day. Responses do not include the API key or provider error details. These are lightweight demo controls, not production security measures or per-account authorization.
+Only seven lookup/list tools are exposed. All sample accounts, transactions and cases are fabricated. There is no write endpoint and no real bank integration. The server validates tool IDs, rejects write-like user requests, including payment, wire, withdrawal, reversal and case mutation verbs, before the model call and caps tool executions at 8 per request. There is a per-IP 40-request/minute in-memory API limit and an additional process-wide AI quota of 6/minute and 100/day. Responses do not include the API key or provider error details. These are lightweight demo controls, not production security measures or per-account authorization.
 
 The model can still make mistakes or respond without calling a tool. Source record IDs and tool traces are the evidence of what was actually retrieved, not proof of a correct fraud determination. The AI mode currently uses stateless single-turn chat, not persistent memory. The fallback route does not call an LLM.
 

@@ -42,6 +42,29 @@ class AgentControllerTest {
             .andExpect(jsonPath("$.answer").value(org.hamcrest.Matchers.startsWith("Denied.")));
     }
 
+    @Test void additionalPaymentAndCaseMutationsAreDeniedWithoutToolCalls() throws Exception {
+        for (String message : new String[] {
+            "Wire $500 from ACC-1001",
+            "Withdraw $500 from ACC-1001",
+            "Pay the merchant for TX-2002",
+            "Reverse TX-2002",
+            "Cancel CASE-101",
+            "Settle TX-2002",
+            "Disburse money from ACC-1001"
+        }) {
+            ask(message).andExpect(status().isOk())
+                .andExpect(jsonPath("$.mode").value("policy-denied"))
+                .andExpect(jsonPath("$.trace.length()").value(0))
+                .andExpect(jsonPath("$.answer").value(org.hamcrest.Matchers.startsWith("Denied.")));
+        }
+    }
+
+    @Test void writeWordsInsideOtherWordsDoNotTriggerDenial() throws Exception {
+        ask("Investigate TX-2002").andExpect(status().isOk())
+            .andExpect(jsonPath("$.mode").value("deterministic-structured-tools"))
+            .andExpect(jsonPath("$.trace.length()").value(3));
+    }
+
     @Test void missingIdsAreNotFabricated() throws Exception {
         ask("Investigate TX-9999").andExpect(status().isOk())
             .andExpect(jsonPath("$.trace[0].outcome").value("not_found"))
