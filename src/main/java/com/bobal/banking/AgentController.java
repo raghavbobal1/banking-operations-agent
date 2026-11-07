@@ -142,14 +142,14 @@ public class AgentController {
                             () -> data.accounts().stream()
                                 .filter(a -> a.id().equals(tx.accountId())).findFirst().orElse(null));
                     answer = "Case investigation of " + found.id()
-                        + "\\nCase status: " + found.status()
-                        + "\\nTransaction: " + (tx == null
+                        + "\nCase status: " + found.status()
+                        + "\nTransaction: " + (tx == null
                             ? "No linked synthetic transaction found for " + found.transactionId()
                             : describe(tx))
-                        + "\\nAccount: " + (account == null ? "Not available"
+                        + "\nAccount: " + (account == null ? "Not available"
                             : account.id() + " (" + account.type() + ")")
-                        + "\\nAssessment: The records show status and linkage only. They do not establish a root cause or fraud finding."
-                        + "\\nNo banking action was taken.";
+                        + "\nAssessment: The records show status and linkage only. They do not establish a root cause or fraud finding."
+                        + "\nNo banking action was taken.";
                 } else {
                     answer = found.id() + " | " + found.status() + " | Related transaction: " + found.transactionId();
                 }
