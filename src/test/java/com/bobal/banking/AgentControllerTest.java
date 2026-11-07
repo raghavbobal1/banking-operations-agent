@@ -36,6 +36,23 @@ class AgentControllerTest {
             .andExpect(jsonPath("$.answer").value(org.hamcrest.Matchers.containsString("TX-2002")));
     }
 
+    @Test void caseInvestigationTracesLinkedTransactionAndAccount() throws Exception {
+        ask("Investigate CASE-001").andExpect(status().isOk())
+            .andExpect(jsonPath("$.mode").value("deterministic-structured-tools"))
+            .andExpect(jsonPath("$.trace.length()").value(3))
+            .andExpect(jsonPath("$.trace[0].tool").value("case.lookup"))
+            .andExpect(jsonPath("$.trace[1].tool").value("transaction.lookup"))
+            .andExpect(jsonPath("$.trace[2].tool").value("account.lookup"))
+            .andExpect(jsonPath("$.answer").value(org.hamcrest.Matchers.containsString("No banking action was taken")));
+    }
+
+    @Test void unknownCaseDoesNotInventLinkedEvidence() throws Exception {
+        ask("Investigate CASE-999").andExpect(status().isOk())
+            .andExpect(jsonPath("$.trace.length()").value(1))
+            .andExpect(jsonPath("$.trace[0].outcome").value("not_found"))
+            .andExpect(jsonPath("$.answer").value(org.hamcrest.Matchers.containsString("No synthetic case exists")));
+    }
+
     @Test void writeAttemptIsDeniedWithoutToolCalls() throws Exception {
         ask("Transfer funds from ACC-1001").andExpect(status().isOk())
             .andExpect(jsonPath("$.trace.length()").value(0))

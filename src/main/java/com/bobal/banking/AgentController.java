@@ -131,8 +131,28 @@ public class AgentController {
                 OperationsController.SupportCase found = tool(trace, "case.lookup", caseId,
                     "read:cases", () -> data.cases().stream()
                         .filter(c -> c.id().equals(caseId)).findFirst().orElse(null));
-                answer = found == null ? "No synthetic case exists with ID " + caseId + "."
-                    : found.id() + " | " + found.status() + " | Related transaction: " + found.transactionId();
+                if (found == null) {
+                    answer = "No synthetic case exists with ID " + caseId + ".";
+                } else if (contains(input, "INVESTIGATE", "DETAIL", "EXPLAIN", "RELATED", "CONTEXT")) {
+                    OperationsController.Transaction tx = tool(trace, "transaction.lookup", found.transactionId(),
+                        "read:transactions", () -> data.transactions().stream()
+                            .filter(t -> t.id().equals(found.transactionId())).findFirst().orElse(null));
+                    OperationsController.Account account = tx == null ? null
+                        : tool(trace, "account.lookup", tx.accountId(), "read:accounts",
+                            () -> data.accounts().stream()
+                                .filter(a -> a.id().equals(tx.accountId())).findFirst().orElse(null));
+                    answer = "Case investigation of " + found.id()
+                        + "\nCase status: " + found.status()
+                        + "\nTransaction: " + (tx == null
+                            ? "No linked synthetic transaction found for " + found.transactionId()
+                            : describe(tx))
+                        + "\nAccount: " + (account == null ? "Not available"
+                            : account.id() + " (" + account.type() + ")")
+                        + "\nAssessment: The records show status and linkage only. They do not establish a root cause or fraud finding."
+                        + "\nNo banking action was taken.";
+                } else {
+                    answer = found.id() + " | " + found.status() + " | Related transaction: " + found.transactionId();
+                }
             } else if (contains(input, "CASE", "TICKET")) {
                 List<OperationsController.SupportCase> cases = tool(trace, "case.list", "all",
                     "read:cases", () -> data.cases().stream()
