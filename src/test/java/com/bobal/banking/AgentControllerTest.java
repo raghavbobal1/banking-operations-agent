@@ -37,7 +37,7 @@ class AgentControllerTest {
     }
 
     @Test void caseInvestigationTracesLinkedTransactionAndAccount() throws Exception {
-        ask("Investigate CASE-101").andExpect(status().isOk())
+        ask("Investigate CASE-001").andExpect(status().isOk())
             .andExpect(jsonPath("$.mode").value("deterministic-structured-tools"))
             .andExpect(jsonPath("$.trace.length()").value(3))
             .andExpect(jsonPath("$.trace[0].tool").value("case.lookup"))
