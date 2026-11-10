@@ -29,8 +29,6 @@ public class AgentController {
     private static final Pattern ACCOUNT = Pattern.compile("\\bACC-\\d{4}\\b");
     private static final Pattern TRANSACTION = Pattern.compile("\\bTX-\\d{4}\\b");
     private static final Pattern CASE = Pattern.compile("\\bCASE-\\d{3}\\b");
-    private static final Pattern WRITE = Pattern.compile(
-        "\\b(CREATE|DELETE|UPDATE|TRANSFER|SEND|REFUND|FREEZE|UNFREEZE|BLOCK|CLOSE|APPROVE|REJECT|ESCALATE|MODIFY|CHANGE|WITHDRAW|DEPOSIT|WIRE|PAY|PAYOUT|REVERSE|CANCEL|VOID|SETTLE|DISBURSE)\\b");
     private static final List<String> PERMISSIONS =
         List.of("read:accounts", "read:transactions", "read:cases");
     private final OperationsController data;
@@ -72,7 +70,7 @@ public class AgentController {
     public ChatResponse chat(@Valid @RequestBody ChatRequest request, HttpServletRequest http) {
         rateLimit(http.getRemoteAddr());
         String input = request.message().trim().toUpperCase(Locale.ROOT);
-        if (WRITE.matcher(input).find()) {
+        if (WritePolicy.isWriteRequest(input)) {
             return new ChatResponse(UUID.randomUUID().toString(), "policy-denied",
                 "Denied. This agent has read-only permissions. It cannot create cases, move money or change records.",
                 List.of(), PERMISSIONS, true);

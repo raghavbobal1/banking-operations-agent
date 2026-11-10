@@ -67,7 +67,11 @@ class AgentControllerTest {
             "Reverse TX-2002",
             "Cancel CASE-101",
             "Settle TX-2002",
-            "Disburse money from ACC-1001"
+            "Disburse money from ACC-1001",
+            "Move money from ACC-1001 to ACC-1002",
+            "Make a payment from ACC-1001",
+            "Issue a refund for TX-2002",
+            "Mark CASE-001 as resolved"
         }) {
             ask(message).andExpect(status().isOk())
                 .andExpect(jsonPath("$.mode").value("policy-denied"))
@@ -80,6 +84,12 @@ class AgentControllerTest {
         ask("Investigate TX-2002").andExpect(status().isOk())
             .andExpect(jsonPath("$.mode").value("deterministic-structured-tools"))
             .andExpect(jsonPath("$.trace.length()").value(3));
+    }
+
+    @Test void informationalPaymentQuestionRemainsReadOnly() throws Exception {
+        ask("Show payment activity for ACC-1001").andExpect(status().isOk())
+            .andExpect(jsonPath("$.mode").value("deterministic-structured-tools"))
+            .andExpect(jsonPath("$.trace.length()").value(2));
     }
 
     @Test void missingIdsAreNotFabricated() throws Exception {
