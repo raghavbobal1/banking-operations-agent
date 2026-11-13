@@ -50,13 +50,16 @@ That verification calls the live model once, checks the server executed a real r
 
 **Deployment status:** There is no confirmed public AI URL in this repository. Keep portfolio demo links unpublished until the hosted AI verification succeeds.
 
+The browser demo disables duplicate requests while an investigation runs, times out stalled requests after 45 seconds and provides a retry control when a sleeping backend is unavailable. A cold start can still require retrying.
+
 ## Try these questions
 
 - Investigate TX-2002 and show its related account and case
 - What transactions belong to ACC-1001?
 - Why is TX-2002 marked for review?
 - Is there evidence that TX-2002 was fraudulent?
-- Investigate CASE-001 and trace its linked transaction and account\n- List all support cases
+- Investigate CASE-001 and trace its linked transaction and account
+- List all support cases
 - Transfer $500 from ACC-1001 (blocked, no tools executed)
 
 Use `GET /api/agent/status` to confirm whether the **actual running backend** is in `spring-ai-tool-calling` or `deterministic-structured-tools` mode. `POST /api/agent/chat` returns an answer, explicit mode and ordered tool trace.
