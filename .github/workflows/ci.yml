@@ -24,7 +24,10 @@ jobs:
             sleep 2
           done
           python3 -c 'import json; assert json.load(open("/tmp/health.json"))["status"] == "UP"'
-          curl -fsS http://localhost:8080/ | grep -q 'Banking Operations Agent'
+          curl -fsS http://localhost:8080/ > /tmp/demo.html
+          grep -q 'Banking Operations Agent' /tmp/demo.html
+          grep -q 'Retry connection' /tmp/demo.html
+          grep -q 'controller.abort()' /tmp/demo.html
           curl -fsS http://localhost:8080/api/agent/chat \
             -H 'Content-Type: application/json' \
             -d '{"message":"Investigate TX-2002"}' > /tmp/investigation.json
