@@ -1,0 +1,43 @@
+name: Verify public demo
+on:
+  workflow_dispatch:
+    inputs:
+      service_url:
+        description: Public HTTPS origin of the deployed backend
+        required: true
+        type: string
+      mode:
+        description: Expected backend mode
+        required: true
+        default: ai
+        type: choice
+        options:
+          - ai
+          - offline
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate URL
+        env:
+          SERVICE_URL: ${{ inputs.service_url }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from urllib.parse import urlsplit
+          url = os.environ["SERVICE_URL"]
+          parsed = urlsplit(url)
+          if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment or parsed.path not in ("", "/"):
+              raise SystemExit("Provide an HTTPS service origin without path, query, credentials or fragment")
+          print("HTTPS origin validated")
+          PY
+      - name: Verify live tool calls and write denial
+        env:
+          SERVICE_URL: ${{ inputs.service_url }}
+          EXPECTED_MODE: ${{ inputs.mode }}
+        run: |
+          python3 scripts/verify_demo.py "$SERVICE_URL" --mode "$EXPECTED_MODE"
