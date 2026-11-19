@@ -48,6 +48,8 @@ That verification calls the live model once, checks the server executed a real r
 
 **Cost and safety:** This is a synthetic demo, not a bank service. The process-local quota is 6 model requests per minute and 100 per day, not a durable spending limit. Set a separate provider-side budget and monitor charges. On Render's Free plan the service may sleep and cold-start. Use a paid instance only if you decide the cost is justified. The Blueprint does not include any secret values.
 
+**Verify from GitHub:** Once Render reports the service as live, open [Actions > Verify public demo](../../actions/workflows/verify-public-demo.yml), choose **Run workflow**, paste only the public HTTPS service origin and select `ai`. The workflow executes the real HTTP checks from a clean GitHub runner, with no model key stored in GitHub. A successful run verifies the specific endpoint at that time, not ongoing uptime. Do not use the offline option as evidence of model-driven AI.
+
 **Deployment status:** There is no confirmed public AI URL in this repository. Keep portfolio demo links unpublished until the hosted AI verification succeeds.
 
 The browser demo disables duplicate requests while an investigation runs, times out stalled requests after 45 seconds and provides a retry control when a sleeping backend is unavailable. A cold start can still require retrying.
