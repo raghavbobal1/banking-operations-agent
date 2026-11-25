@@ -12,6 +12,8 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
+      - name: Check deployment and verification contracts
+        run: python3 -m unittest discover -s scripts -p 'test_deployment_contract.py' -v
       - name: Run unit and integration tests
         run: mvn -B clean verify
       - name: Smoke test running HTTP service
